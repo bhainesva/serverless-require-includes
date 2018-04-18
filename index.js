@@ -17,14 +17,21 @@ class ServerlessPlugin {
       return
     }
 
+    let foundMissingInclude = false;
+
     for (const include of this.serverless.variables.service.package.include) {
       if (!fs.existsSync(include)) {
-        this.serverless.cli.log("Missing include: " + include);
-        process.exit(1);
+        this.serverless.cli.log('missing package.include: ' + include);
+        foundMissingInclude = true;
       }
     }
-  }
 
+    if (foundMissingInclude) {
+      throw new this.serverless.classes.Error(
+        'serverless-require-includes: detected missing package.include dependency'
+      );
+    }
+  }
 }
 
 module.exports = ServerlessPlugin;
